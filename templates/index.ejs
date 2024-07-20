@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Task Manager</h1>
+    <form id="task-form">
+        <label for="title">Task Title:</label>
+        <input type="text" id="title" name="title">
+        <button type="submit">Get Recommendations</button>
+    </form>
+    <h2>Tasks:</h2>
+    <ul id="tasks-list">
+        {% for task in tasks %}
+            <li>{{ task['Tasks'] }}: {{ task['Descriptions'] }} (Deadline: {{ task['Deadline'] }})</li>
+        {% endfor %}
+    </ul>
+    <h2>Recommendations:</h2>
+    <ul id="recommendations-list"></ul>
+    <script>
+        document.getElementById('task-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('title').value;
+            fetch('/recommend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const recommendationsList = document.getElementById('recommendations-list');
+                recommendationsList.innerHTML = '';
+                data.forEach(task => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${task.Tasks}: ${task.Descriptions} (Deadline: ${task.Deadline})`;
+                    recommendationsList.appendChild(listItem);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
